@@ -1,5 +1,7 @@
 """Fashion Item Classifier - a Streamlit app built on Hager's Fashion-MNIST CNN."""
 import os
+import glob
+import re
 import torch
 import streamlit as st
 from PIL import Image, ImageOps
@@ -11,7 +13,7 @@ st.set_page_config(page_title="What am I wearing?", page_icon="👕", layout="ce
 @st.cache_resource
 def load_model():
     model = CNN_batch(out_1=16, out_2=32, number_of_classes=10)
-    model.load_state_dict(torch.load("fashion_mnist_cnn.pth", map_location="cpu", weights_only=True))
+    model.load_state_dict(torch.load(glob.glob("*fashion_mnist_cnn.pth")[0], map_location="cpu", weights_only=True))
     model.eval()
     return model
 
@@ -52,12 +54,12 @@ with tab_upload:
         img = Image.open(uploaded)
 
 with tab_sample:
-    sample_files = sorted(os.listdir("samples"))
+    sample_files = sorted(os.listdir("samples")) if os.path.isdir("samples") else []
     cols = st.columns(5)
     for i, fname in enumerate(sample_files):
         with cols[i % 5]:
             st.image(f"samples/{fname}", width=60)
-            if st.button(fname.replace(".png", ""), key=fname):
+            if st.button(re.sub(r"^\d+-", "", fname).replace(".png", ""), key=fname):
                 img = Image.open(f"samples/{fname}")
 
 if img is not None:
