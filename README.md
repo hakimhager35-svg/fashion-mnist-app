@@ -1,2 +1,2 @@
-# Fashon Minst
+# Fashion Minst
 
